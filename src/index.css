@@ -1,26 +1,26 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Toss Style Dark Token System */
+  --toss-bg-base: #191F28;
+  --toss-bg-layer: #333D4B;
+  --toss-blue: #3182F6;
+  --toss-text-primary: #FFFFFF;
+  --toss-text-secondary: #B0B8C1;
+  --toss-text-tertiary: #6B7684;
+  --toss-radius-l: 24px;
+  --toss-radius-m: 16px;
+
+  color-scheme: dark;
+  color: var(--toss-text-primary);
+  background-color: var(--toss-bg-base);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
 }
 
 body {
@@ -30,24 +30,106 @@ body {
   justify-content: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #1a1a1a;
+  background-color: #000;
+  /* Outer background */
+  font-family: inherit;
 }
-
-/* ... existing button styles ... */
 
 .app-container {
   width: 375px;
   height: 812px;
-  background-color: #242424;
-  /* Mobile App Background */
+  background-color: var(--toss-bg-base);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-  /* Shadow for depth */
+  box-shadow: 0 0 0 1px #333, 0 20px 60px rgba(0, 0, 0, 0.6);
+  /* Cleaner border & shadow */
   border-radius: 40px;
-  /* Rounded corners like iPhone */
-  border: 8px solid #333;
-  /* Simulate bezel */
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-weight: 700;
+  color: var(--toss-text-primary);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Typography Utilities */
+.text-display {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.text-subtitle {
+  font-size: 17px;
+  color: var(--toss-text-secondary);
+  font-weight: 500;
+}
+
+/* Components */
+.toss-card {
+  background-color: var(--toss-bg-layer);
+  border-radius: var(--toss-radius-l);
+  padding: 24px;
+}
+
+.toss-button {
+  background-color: var(--toss-blue);
+  color: white;
+  font-weight: 600;
+  font-size: 17px;
+  padding: 16px;
+  border-radius: var(--toss-radius-m);
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: transform 0.1s ease, filter 0.2s;
+}
+
+.toss-button:active {
+  transform: scale(0.96);
+  filter: brightness(0.9);
+}
+
+.glass-panel {
+  /* Keeping glass for specific vibe elements but cleaner */
+  background: rgba(51, 61, 75, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
 }

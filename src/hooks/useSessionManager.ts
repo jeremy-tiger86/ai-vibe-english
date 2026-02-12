@@ -9,6 +9,7 @@ export function useSessionManager() {
     const [status, setStatus] = useState<SessionStatus>('disconnected');
     const [volume, setVolume] = useState(0); // For visualization
     const [summary, setSummary] = useState<string | null>(null);
+    const [score, setScore] = useState<any | null>(null);
 
     // Audio Output (Speaker)
     const audioContextRef = useRef<AudioContext | null>(null);
@@ -88,7 +89,7 @@ export function useSessionManager() {
             {
                 apiKey,
                 model: 'gemini-1.5-flash-latest',
-                systemInstruction: SYSTEM_INSTRUCTION.role + "\n" + SYSTEM_INSTRUCTION.rules.join("\n")
+                systemInstruction: SYSTEM_INSTRUCTION.role + "\n" + SYSTEM_INSTRUCTION.rules.join("\n") + "\n" + SYSTEM_INSTRUCTION.evaluationProtocol
             },
             (state) => {
                 setStatus(state);
@@ -103,9 +104,19 @@ export function useSessionManager() {
                 setStatus('speaking');
             },
             (textData) => {
-                // Append text if multiple chunks or just set it
-                // Usually summary comes at the end
-                setSummary(prev => (prev || '') + textData);
+                setSummary(prev => {
+                    const newSummary = (prev || '') + textData;
+                    try {
+                        const jsonMatch = newSummary.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (parsed.fluency_score !== undefined) {
+                                setScore(parsed);
+                            }
+                        }
+                    } catch (e) { /* ignore incomplete json */ }
+                    return newSummary;
+                });
             }
         );
         clientRef.current.connect();
@@ -118,5 +129,5 @@ export function useSessionManager() {
         setVolume(0);
     }, [stopRecording]);
 
-    return { status, connect, disconnect, volume, SYSTEM_INSTRUCTION, summary };
+    return { status, connect, disconnect, volume, SYSTEM_INSTRUCTION, summary, score };
 }

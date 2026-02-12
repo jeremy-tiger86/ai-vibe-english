@@ -32,10 +32,10 @@ const VibeButton: React.FC<VibeButtonProps> = ({ status, volume, onClick }) => {
             // Base Circle (Glassmorphism)
             const gradient = ctx.createRadialGradient(centerX, centerY, baseRadius * 0.8, centerX, centerY, baseRadius * 1.5);
 
-            let primaryColor = '100, 100, 255'; // Blue-ish
-            if (status === 'error') primaryColor = '255, 100, 100';
-            if (status === 'connected' || status === 'listening') primaryColor = '100, 255, 150';
-            if (status === 'speaking') primaryColor = '255, 100, 200';
+            let primaryColor = '49, 130, 246'; // Toss Blue (#3182F6) default
+            if (status === 'error') primaryColor = '240, 68, 82'; // Toss Red (#F04452)
+            if (status === 'connected' || status === 'listening') primaryColor = '49, 130, 246'; // Toss Blue
+            if (status === 'speaking') primaryColor = '52, 199, 89'; // Toss Green (#34C759) or similar vibrant
 
             gradient.addColorStop(0, `rgba(${primaryColor}, 0.2)`);
             gradient.addColorStop(1, `rgba(${primaryColor}, 0.0)`);
