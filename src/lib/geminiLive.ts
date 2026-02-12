@@ -34,11 +34,13 @@ export class GeminiLiveClient {
         if (this.ws) return;
 
         this.onStateChange('connecting');
-        this.onLog?.("Connecting to Gemini WebSocket...");
+        this.onLog?.("Connecting to Gemini WebSocket via Local Proxy...");
 
-        const host = "generativelanguage.googleapis.com";
-        const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
-        const url = `${uri}?key=${this.config.apiKey}`;
+        // Connect to local proxy server
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+        const host = window.location.hostname; // e.g., '192.168.1.x' or 'localhost'
+        const port = '3000';
+        const url = `${protocol}://${host}:${port}`;
 
         try {
             this.ws = new WebSocket(url);
