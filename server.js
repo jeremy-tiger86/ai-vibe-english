@@ -10,8 +10,19 @@ const port = 3000;
 
 app.use(cors());
 
-const server = app.listen(port, () => {
-    console.log(`Proxy server running on http://localhost:${port}`);
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        time: new Date().toISOString(),
+        env: {
+            hasApiKey: !!process.env.VITE_GEMINI_API_KEY
+        }
+    });
+});
+
+const server = app.listen(port, "0.0.0.0", () => {
+    console.log(`Proxy server running on port ${port}`);
+    console.log(`Health check: http://localhost:${port}/health`);
 });
 
 const wss = new WebSocketServer({ server });

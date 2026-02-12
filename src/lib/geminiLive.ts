@@ -65,13 +65,17 @@ export class GeminiLiveClient {
         };
 
         this.ws.onclose = (event) => {
-            this.onLog?.(`WebSocket Closed. Code: ${event.code}, Reason: ${event.reason}`);
+            this.onLog?.(`WebSocket Closed. Code: ${event.code}, Reason: ${event.reason || 'No reason provided'}`);
+            if (event.code === 1006) {
+                this.onLog?.("Tip: 1006 usually means the proxy is unreachable. check if 'npm run server' is running and port 3000 is open.");
+            }
             this.onStateChange('disconnected');
             this.ws = null;
         };
 
         this.ws.onerror = (error) => {
-            this.onLog?.("WebSocket Error Event");
+            this.onLog?.(`WebSocket Error Event. Target: ${url}`);
+            this.onLog?.("Check: Are you on the same Wi-Fi? (if local) / Is VITE_PROXY_URL correct? (if deployed)");
             console.error("Gemini WebSocket Error:", error);
             this.onStateChange('error');
         };
