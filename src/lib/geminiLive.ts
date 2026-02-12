@@ -34,13 +34,17 @@ export class GeminiLiveClient {
         if (this.ws) return;
 
         this.onStateChange('connecting');
-        this.onLog?.("Connecting to Gemini WebSocket via Local Proxy...");
+        this.onLog?.("Connecting to Gemini WebSocket via Proxy...");
 
-        // Connect to local proxy server
+        // Use VITE_PROXY_URL from env if available (for production), 
+        // otherwise fallback to local hostname:3000
+        const envProxyUrl = import.meta.env.VITE_PROXY_URL;
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-        const host = window.location.hostname; // e.g., '192.168.1.x' or 'localhost'
+        const host = window.location.hostname;
         const port = '3000';
-        const url = `${protocol}://${host}:${port}`;
+
+        const url = envProxyUrl || `${protocol}://${host}:${port}`;
+        this.onLog?.(`Proxy URL: ${url}`);
 
         try {
             this.ws = new WebSocket(url);

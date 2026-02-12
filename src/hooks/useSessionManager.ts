@@ -81,7 +81,8 @@ export function useSessionManager({ onLog }: UseSessionManagerProps = {}) {
             // Or better: Mix them? For now, input volume has priority during 'listening'
             setVolume(vol);
         },
-        onLog
+        onLog,
+        audioContext: audioContextRef.current
     });
 
     const connect = useCallback(async () => {
@@ -131,10 +132,7 @@ export function useSessionManager({ onLog }: UseSessionManagerProps = {}) {
             (state) => {
                 setStatus(state);
                 onLog?.("Gemini State: " + state);
-                if (state === 'connected') {
-                    onLog?.("Gemini Connected. Starting mic...");
-                    startRecording();
-                } else if (state === 'disconnected') {
+                if (state === 'disconnected') {
                     stopRecording();
                 } else if (state === 'error') {
                     onLog?.("Gemini Error");
@@ -162,6 +160,10 @@ export function useSessionManager({ onLog }: UseSessionManagerProps = {}) {
         );
         onLog?.("Connecting to Gemini...");
         clientRef.current.connect();
+
+        // START MIC IMMEDIATELY (Safari requirement: must be within user gesture)
+        onLog?.("Activating microphone...");
+        startRecording();
     }, [startRecording, stopRecording, playAudioChunk, onLog]);
 
     const disconnect = useCallback(() => {

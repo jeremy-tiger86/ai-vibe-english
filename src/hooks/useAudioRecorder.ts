@@ -5,6 +5,7 @@ export interface AudioRecorderConfig {
     onAudioData: (base64: string) => void;
     onVolumeChange?: (volume: number) => void; // 0-100
     onLog?: (msg: string) => void;
+    audioContext?: AudioContext | null;
 }
 
 // Simple Linear Interpolation / Decimation
@@ -22,13 +23,14 @@ const downsampleBuffer = (buffer: Float32Array, inputRate: number, outputRate: n
     return result;
 };
 
-export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLog }: AudioRecorderConfig) {
+export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLog, audioContext }: AudioRecorderConfig) {
     const [isRecording, setIsRecording] = useState(false);
     const contextRef = useRef<AudioContext | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
     const workletNodeRef = useRef<AudioWorkletNode | null>(null);
 
     const start = useCallback(async () => {
+        if (isRecording) return;
         try {
             onLog?.("Requesting microphone access...");
             // 1. Remove sampleRate constraint to avoid failure on some devices
@@ -44,13 +46,21 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLo
             onLog?.("Microphone access granted");
             streamRef.current = stream;
 
-            // 2. Create AudioContext with system default sample rate
-            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-            const context = new AudioContextClass(); // No sampleRate arg
+            // 2. Use existing AudioContext or create new
+            let context = audioContext;
+            if (!context) {
+                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                context = new AudioContextClass();
+            }
             contextRef.current = context;
 
+            // Ensure context is resumed (Safari requirement)
+            if (context.state === 'suspended') {
+                await context.resume();
+            }
+
             const sourceSampleRate = context.sampleRate;
-            onLog?.(`AudioContext created. Sample Rate: ${sourceSampleRate}Hz`);
+            onLog?.(`AudioContext active. Sample Rate: ${sourceSampleRate}Hz`);
 
             try {
                 await context.audioWorklet.addModule('/pcm-processor.js');
