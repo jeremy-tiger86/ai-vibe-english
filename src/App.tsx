@@ -26,7 +26,12 @@ function App() {
         pointerEvents: 'none'
       }} />
 
-      <header style={{ position: 'absolute', top: '3rem', left: 0, width: '100%', textAlign: 'center', padding: '0 24px' }}>
+      <header style={{
+        width: '100%',
+        textAlign: 'center',
+        padding: '3rem 24px 0', // Top padding instead of absolute position 
+        zIndex: 1
+      }}>
         <h1 className="text-display" style={{ marginBottom: '8px' }}>
           영어 빡세게 말하기
         </h1>
