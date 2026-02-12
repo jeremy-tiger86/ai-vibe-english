@@ -3,17 +3,17 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* Toss Style Dark Token System */
-  --toss-bg-base: #191F28;
-  --toss-bg-layer: #333D4B;
+  /* Toss Style Light Token System */
+  --toss-bg-base: #FFFFFF;
+  --toss-bg-layer: #F2F4F6;
   --toss-blue: #3182F6;
-  --toss-text-primary: #FFFFFF;
-  --toss-text-secondary: #B0B8C1;
-  --toss-text-tertiary: #6B7684;
+  --toss-text-primary: #191F28;
+  --toss-text-secondary: #4E5968;
+  --toss-text-tertiary: #8B95A1;
   --toss-radius-l: 24px;
   --toss-radius-m: 16px;
 
-  color-scheme: dark;
+  color-scheme: light;
   color: var(--toss-text-primary);
   background-color: var(--toss-bg-base);
 
@@ -23,29 +23,29 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+html,
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  justify-content: center;
-  min-width: 320px;
-  min-height: 100vh;
-  background-color: #000;
-  /* Outer background */
-  font-family: inherit;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Prevent elastic scrolling */
+  background-color: var(--toss-bg-base);
+  touch-action: none;
+  /* Prevent zoom/pan */
 }
 
 .app-container {
-  width: 375px;
-  height: 812px;
+  width: 100%;
+  height: 100dvh;
+  /* Dynamic Viewport Height */
   background-color: var(--toss-bg-base);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 0 1px #333, 0 20px 60px rgba(0, 0, 0, 0.6);
-  /* Cleaner border & shadow */
-  border-radius: 40px;
+  /* Removed border and radius for full immersion */
 }
 
 h1,
@@ -66,8 +66,9 @@ button {
 /* Typography Utilities */
 .text-display {
   font-size: 26px;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.5px;
+  color: var(--toss-text-primary);
 }
 
 .text-subtitle {
@@ -78,9 +79,12 @@ button {
 
 /* Components */
 .toss-card {
-  background-color: var(--toss-bg-layer);
+  background-color: #FFFFFF;
   border-radius: var(--toss-radius-l);
   padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  /* Soft shadow for light theme */
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .toss-button {
@@ -98,16 +102,15 @@ button {
 
 .toss-button:active {
   transform: scale(0.96);
-  filter: brightness(0.9);
+  filter: brightness(0.95);
 }
 
 .glass-panel {
-  /* Keeping glass for specific vibe elements but cleaner */
-  background: rgba(51, 61, 75, 0.7);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 }
 
 @keyframes fadeIn {

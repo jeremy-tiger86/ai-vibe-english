@@ -20,10 +20,10 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
     };
 
     const getColor = (s: number) => {
-        if (s >= 90) return '#4caf50';
+        if (s >= 90) return '#34C759'; // Green
         if (s >= 80) return '#3182F6'; // Toss Blue for A
-        if (s >= 70) return '#ff9800';
-        return '#f44336';
+        if (s >= 70) return '#FF9500'; // Orange
+        return '#FF3B30'; // Red
     };
 
     return (
@@ -35,7 +35,6 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
             width: '85%',
             maxWidth: '320px',
             animation: 'popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
             zIndex: 100
         }}>
             <h2 style={{ textAlign: 'center', marginBottom: '8px', fontSize: '22px' }}>Session Report</h2>
@@ -49,9 +48,9 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
                 <Metric label="Confidence" score={score.confidence_score} />
             </div>
 
-            <div style={{ marginBottom: '24px', background: 'rgba(255,255,255,0.05)', padding: '16px', borderRadius: '16px' }}>
+            <div style={{ marginBottom: '24px', background: 'var(--toss-bg-layer)', padding: '16px', borderRadius: '16px' }}>
                 <h4 style={{ color: 'var(--toss-text-secondary)', fontSize: '13px', marginBottom: '8px' }}>FEEDBACK</h4>
-                <p style={{ fontSize: '15px', lineHeight: '1.5', color: '#fff', fontWeight: 500 }}>{score.feedback}</p>
+                <p style={{ fontSize: '15px', lineHeight: '1.5', color: 'var(--toss-text-primary)', fontWeight: 500 }}>{score.feedback}</p>
             </div>
 
             <div style={{ marginBottom: '32px' }}>
@@ -59,11 +58,11 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {score.key_phrases.map((phrase, i) => (
                         <div key={i} style={{
-                            background: 'var(--toss-bg-base)',
+                            background: 'var(--toss-bg-layer)',
                             padding: '12px 16px',
                             borderRadius: '12px',
                             fontSize: '14px',
-                            color: '#E5E8EB',
+                            color: 'var(--toss-text-primary)',
                             fontWeight: 500
                         }}>
                             {phrase}
