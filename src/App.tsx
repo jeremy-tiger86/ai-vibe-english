@@ -30,9 +30,6 @@ function App() {
         <h1 className="text-display" style={{ marginBottom: '8px' }}>
           영어 빡세게 말하기
         </h1>
-        <p className="text-subtitle">
-          {status === 'disconnected' ? "Tap to catch the vibe" : "Keep the flow going"}
-        </p>
       </header>
 
       <main style={{
@@ -51,15 +48,24 @@ function App() {
 
         {/* Session Tips / Subtitles could go here */}
         <div style={{
-          marginTop: '3rem',
-          height: '2rem',
-          color: 'var(--color-text-muted)',
-          fontSize: '0.9rem',
-          textAlign: 'center'
+          marginTop: '2rem',
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
         }}>
-          {status === 'connected' && "Say: 'Hello!'"}
-          {status === 'listening' && "Listening..."}
-          {status === 'speaking' && "AI Speaking..."}
+          <p className="text-subtitle" style={{ margin: 0 }}>
+            {status === 'disconnected' ? "Tap to catch the vibe" : "Keep the flow going"}
+          </p>
+          <div style={{
+            height: '2rem',
+            color: 'var(--color-text-muted)',
+            fontSize: '0.9rem',
+          }}>
+            {status === 'connected' && "Say: 'Hello!'"}
+            {status === 'listening' && "Listening..."}
+            {status === 'speaking' && "AI Speaking..."}
+          </div>
         </div>
 
         {/* Session Summary Overlay */}
