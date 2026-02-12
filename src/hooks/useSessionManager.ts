@@ -67,15 +67,27 @@ export function useSessionManager() {
         sampleRate: 16000,
         onAudioData: (base64) => {
             clientRef.current?.sendAudio(base64);
-            // Visual feedback for input
-            setStatus('listening');
+            // Visual feedback for input handled by onVolumeChange
+            if (status !== 'speaking') {
+                setStatus('listening');
+            }
+        },
+        onVolumeChange: (vol) => {
+            // Only update volume if not speaking (to avoid conflict with output volume)
+            // Or better: Mix them? For now, input volume has priority during 'listening'
+            setVolume(vol);
         }
     });
 
-    const connect = useCallback(() => {
+    const connect = useCallback(async () => {
         if (!audioContextRef.current) {
             const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
             audioContextRef.current = new AudioContextClass();
+        }
+
+        // Resume AudioContext (important for mobile safari)
+        if (audioContextRef.current.state === 'suspended') {
+            await audioContextRef.current.resume();
         }
 
         setSummary(null); // Reset summary
