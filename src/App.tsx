@@ -21,7 +21,7 @@ function App() {
       <div style={{
         position: 'absolute',
         top: 0, left: 0, width: '100%', height: '100%',
-        background: 'var(--toss-bg-base)',
+        background: 'var(--speak-bg-base)',
         zIndex: -1,
         pointerEvents: 'none'
       }} />
@@ -33,7 +33,7 @@ function App() {
         zIndex: 1
       }}>
         <h1 className="text-display" style={{ marginBottom: '8px' }}>
-          영어 빡세게 말하기
+          빡세게 말하기
         </h1>
       </header>
 
@@ -129,7 +129,7 @@ function App() {
         bottom: '1rem',
         width: '100%',
         textAlign: 'center',
-        color: 'var(--toss-text-tertiary)',
+        color: 'var(--speak-text-tertiary)',
         fontSize: '13px',
         fontWeight: 500
       }}>

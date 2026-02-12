@@ -20,14 +20,14 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
     };
 
     const getColor = (s: number) => {
-        if (s >= 90) return '#34C759'; // Green
-        if (s >= 80) return '#3182F6'; // Toss Blue for A
+        if (s >= 90) return '#27D486'; // Speak Green
+        if (s >= 80) return '#3182F6'; // Blue
         if (s >= 70) return '#FF9500'; // Orange
         return '#FF3B30'; // Red
     };
 
     return (
-        <div className="toss-card" style={{
+        <div className="speak-card" style={{
             position: 'absolute',
             top: '50%',
             left: '50%',
@@ -38,7 +38,7 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
             zIndex: 100
         }}>
             <h2 style={{ textAlign: 'center', marginBottom: '8px', fontSize: '22px' }}>Session Report</h2>
-            <p style={{ textAlign: 'center', color: 'var(--toss-text-secondary)', marginBottom: '24px', fontSize: '15px' }}>
+            <p style={{ textAlign: 'center', color: 'var(--speak-text-secondary)', marginBottom: '24px', fontSize: '15px' }}>
                 Great job! Here is your result.
             </p>
 
@@ -48,21 +48,21 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
                 <Metric label="Confidence" score={score.confidence_score} />
             </div>
 
-            <div style={{ marginBottom: '24px', background: 'var(--toss-bg-layer)', padding: '16px', borderRadius: '16px' }}>
-                <h4 style={{ color: 'var(--toss-text-secondary)', fontSize: '13px', marginBottom: '8px' }}>FEEDBACK</h4>
-                <p style={{ fontSize: '15px', lineHeight: '1.5', color: 'var(--toss-text-primary)', fontWeight: 500 }}>{score.feedback}</p>
+            <div style={{ marginBottom: '24px', background: 'var(--speak-bg-layer)', padding: '16px', borderRadius: '16px' }}>
+                <h4 style={{ color: 'var(--speak-text-secondary)', fontSize: '13px', marginBottom: '8px' }}>FEEDBACK</h4>
+                <p style={{ fontSize: '15px', lineHeight: '1.5', color: 'var(--speak-text-primary)', fontWeight: 500 }}>{score.feedback}</p>
             </div>
 
             <div style={{ marginBottom: '32px' }}>
-                <h4 style={{ color: 'var(--toss-text-secondary)', fontSize: '13px', marginBottom: '12px' }}>KEY PHRASES</h4>
+                <h4 style={{ color: 'var(--speak-text-secondary)', fontSize: '13px', marginBottom: '12px' }}>KEY PHRASES</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {score.key_phrases.map((phrase, i) => (
                         <div key={i} style={{
-                            background: 'var(--toss-bg-layer)',
+                            background: 'var(--speak-bg-layer)',
                             padding: '12px 16px',
                             borderRadius: '12px',
                             fontSize: '14px',
-                            color: 'var(--toss-text-primary)',
+                            color: 'var(--speak-text-primary)',
                             fontWeight: 500
                         }}>
                             {phrase}
@@ -72,7 +72,7 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
             </div>
 
             {onClose && (
-                <button className="toss-button" onClick={onClose}>
+                <button className="speak-button" onClick={onClose}>
                     Close
                 </button>
             )}
@@ -90,10 +90,10 @@ const ScoreCard: React.FC<ScoreProps> = ({ score, onClose }) => {
                 }}>
                     {getGrade(score)}
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--toss-text-tertiary)', fontWeight: 600 }}>
+                <div style={{ fontSize: '13px', color: 'var(--speak-text-tertiary)', fontWeight: 600 }}>
                     {label}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--toss-text-tertiary)', marginTop: '2px', opacity: 0.7 }}>
+                <div style={{ fontSize: '11px', color: 'var(--speak-text-tertiary)', marginTop: '2px', opacity: 0.7 }}>
                     {score}
                 </div>
             </div>

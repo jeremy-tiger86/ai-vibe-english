@@ -3,19 +3,20 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* Toss Style Light Token System */
-  --toss-bg-base: #FFFFFF;
-  --toss-bg-layer: #F2F4F6;
-  --toss-blue: #3182F6;
-  --toss-text-primary: #191F28;
-  --toss-text-secondary: #4E5968;
-  --toss-text-tertiary: #8B95A1;
-  --toss-radius-l: 24px;
-  --toss-radius-m: 16px;
+  /* Speak Style Light Token System */
+  --speak-green: #27D486;
+  /* Vibrant Mint Green */
+  --speak-bg-base: #FFFFFF;
+  --speak-bg-layer: #F2F4F6;
+  --speak-text-primary: #191F28;
+  --speak-text-secondary: #4E5968;
+  --speak-text-tertiary: #8B95A1;
+  --speak-radius-l: 24px;
+  --speak-radius-m: 16px;
 
   color-scheme: light;
-  color: var(--toss-text-primary);
-  background-color: var(--toss-bg-base);
+  color: var(--speak-text-primary);
+  background-color: var(--speak-bg-base);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -37,7 +38,7 @@ body {
   height: 100%;
   overflow: hidden;
   /* Prevent elastic scrolling */
-  background-color: var(--toss-bg-base);
+  background-color: var(--speak-bg-base);
   touch-action: none;
   /* Prevent zoom/pan */
 }
@@ -46,7 +47,7 @@ body {
   width: 100%;
   height: 100dvh;
   /* Dynamic Viewport Height */
-  background-color: var(--toss-bg-base);
+  background-color: var(--speak-bg-base);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -62,7 +63,7 @@ h5,
 h6 {
   margin: 0;
   font-weight: 700;
-  color: var(--toss-text-primary);
+  color: var(--speak-text-primary);
 }
 
 button {
@@ -74,39 +75,39 @@ button {
   font-size: 26px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: var(--toss-text-primary);
+  color: var(--speak-text-primary);
 }
 
 .text-subtitle {
   font-size: 17px;
-  color: var(--toss-text-secondary);
+  color: var(--speak-text-secondary);
   font-weight: 500;
 }
 
 /* Components */
-.toss-card {
+.speak-card {
   background-color: #FFFFFF;
-  border-radius: var(--toss-radius-l);
+  border-radius: var(--speak-radius-l);
   padding: 24px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   /* Soft shadow for light theme */
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.toss-button {
-  background-color: var(--toss-blue);
+.speak-button {
+  background-color: var(--speak-green);
   color: white;
   font-weight: 600;
   font-size: 17px;
   padding: 16px;
-  border-radius: var(--toss-radius-m);
+  border-radius: var(--speak-radius-m);
   border: none;
   width: 100%;
   cursor: pointer;
   transition: transform 0.1s ease, filter 0.2s;
 }
 
-.toss-button:active {
+.speak-button:active {
   transform: scale(0.96);
   filter: brightness(0.95);
 }
