@@ -7,6 +7,21 @@ export interface AudioRecorderConfig {
     onLog?: (msg: string) => void;
 }
 
+// Simple Linear Interpolation / Decimation
+const downsampleBuffer = (buffer: Float32Array, inputRate: number, outputRate: number) => {
+    if (outputRate >= inputRate) return buffer;
+    const sampleRatio = inputRate / outputRate;
+    const newLength = Math.round(buffer.length / sampleRatio);
+    const result = new Float32Array(newLength);
+
+    for (let i = 0; i < newLength; i++) {
+        // Basic decimation (picking nearest neighbor) - Sufficient for voice
+        const px = Math.floor(i * sampleRatio);
+        result[i] = buffer[px];
+    }
+    return result;
+};
+
 export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLog }: AudioRecorderConfig) {
     const [isRecording, setIsRecording] = useState(false);
     const contextRef = useRef<AudioContext | null>(null);
@@ -37,8 +52,13 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLo
             const sourceSampleRate = context.sampleRate;
             onLog?.(`AudioContext created. Sample Rate: ${sourceSampleRate}Hz`);
 
-            await context.audioWorklet.addModule('/pcm-processor.js');
-            onLog?.("AudioWorklet loaded");
+            try {
+                await context.audioWorklet.addModule('/pcm-processor.js');
+                onLog?.("AudioWorklet loaded");
+            } catch (e: any) {
+                onLog?.(`Error loading AudioWorklet: ${e.message}`);
+                throw e;
+            }
 
             const source = context.createMediaStreamSource(stream);
             const workletNode = new AudioWorkletNode(context, 'pcm-processor');
@@ -57,7 +77,7 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLo
                     onVolumeChange(volume);
                 }
 
-                // Downsample to 16000Hz if necessary
+                // Downsample to 16000Hz (Gemini requirement) if necessary
                 let processedData = float32Array;
                 if (sourceSampleRate !== 16000) {
                     processedData = downsampleBuffer(float32Array, sourceSampleRate, 16000);
@@ -95,29 +115,13 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLo
         }
     }, [sampleRate, onAudioData, onVolumeChange, onLog]);
 
-    // Simple Linear Interpolation / Decimation
-    const downsampleBuffer = (buffer: Float32Array, inputRate: number, outputRate: number) => {
-        if (outputRate >= inputRate) return buffer;
-        const sampleRatio = inputRate / outputRate;
-        const newLength = Math.round(buffer.length / sampleRatio);
-        const result = new Float32Array(newLength);
-
-        for (let i = 0; i < newLength; i++) {
-            // Basic decimation (picking nearest neighbor) - Sufficient for voice
-            // Interpolation would be better but more expensive
-            const px = Math.floor(i * sampleRatio);
-            result[i] = buffer[px];
-        }
-        return result;
-    };
-
     const stop = useCallback(() => {
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
             streamRef.current = null;
         }
         if (contextRef.current) {
-            contextRef.current.close();
+            contextRef.current.close().catch(e => console.error("Error closing AudioContext:", e));
             contextRef.current = null;
         }
         workletNodeRef.current = null;

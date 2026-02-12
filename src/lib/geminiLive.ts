@@ -1,11 +1,3 @@
-/**
- * Gemini Multimodal Live API Client
- * Connects directly via WebSocket for lowest latency (Realtime).
- * Handles:
- * 1. Audio Streaming (Input -> API)
- * 2. Audio Playback (API -> Output)
- * 3. Connection State
- */
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -19,34 +11,45 @@ export class GeminiLiveClient {
     private ws: WebSocket | null = null;
     private config: GeminiConfig;
     private onStateChange: (state: ConnectionState) => void;
-    private onAudioData: (data: string) => void; // Base64 audio chunk
+    private onAudioData: (data: string) => void;
     private onTextData: (text: string) => void;
+    private onLog?: (msg: string) => void;
+    private lastLogTime = 0;
 
     constructor(
         config: GeminiConfig,
         onStateChange: (state: ConnectionState) => void,
         onAudioData: (data: string) => void,
-        onTextData: (text: string) => void
+        onTextData: (text: string) => void,
+        onLog?: (msg: string) => void
     ) {
         this.config = config;
         this.onStateChange = onStateChange;
         this.onAudioData = onAudioData;
         this.onTextData = onTextData;
+        this.onLog = onLog;
     }
 
     connect() {
         if (this.ws) return;
 
         this.onStateChange('connecting');
+        this.onLog?.("Connecting to Gemini WebSocket...");
 
-        // Build WebSocket URL
         const host = "generativelanguage.googleapis.com";
         const uri = `wss://${host}/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent`;
         const url = `${uri}?key=${this.config.apiKey}`;
 
-        this.ws = new WebSocket(url);
+        try {
+            this.ws = new WebSocket(url);
+        } catch (e: any) {
+            this.onLog?.(`WebSocket creation failed: ${e.message}`);
+            this.onStateChange('error');
+            return;
+        }
 
         this.ws.onopen = () => {
+            this.onLog?.("WebSocket Opened via 'onopen' event");
             this.onStateChange('connected');
             this.sendInitialSetup();
         };
@@ -55,12 +58,14 @@ export class GeminiLiveClient {
             this.handleMessage(event);
         };
 
-        this.ws.onclose = () => {
+        this.ws.onclose = (event) => {
+            this.onLog?.(`WebSocket Closed. Code: ${event.code}, Reason: ${event.reason}`);
             this.onStateChange('disconnected');
             this.ws = null;
         };
 
         this.ws.onerror = (error) => {
+            this.onLog?.("WebSocket Error Event");
             console.error("Gemini WebSocket Error:", error);
             this.onStateChange('error');
         };
@@ -68,13 +73,16 @@ export class GeminiLiveClient {
 
     disconnect() {
         if (this.ws) {
+            this.onLog?.("Disconnecting manually...");
             this.ws.close();
             this.ws = null;
         }
     }
 
     sendAudio(base64Audio: string) {
-        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            return;
+        }
 
         const msg = {
             realtime_input: {
@@ -86,20 +94,35 @@ export class GeminiLiveClient {
                 ]
             }
         };
-        this.ws.send(JSON.stringify(msg));
+
+        try {
+            this.ws.send(JSON.stringify(msg));
+            const now = Date.now();
+            if (now - this.lastLogTime > 2000) {
+                this.onLog?.("Sending audio data..."); // Heartbeat log
+                this.lastLogTime = now;
+            }
+        } catch (e: any) {
+            this.onLog?.(`Error sending audio: ${e.message}`);
+        }
     }
 
     private sendInitialSetup() {
         if (!this.ws) return;
 
+        this.onLog?.("Sending Initial Setup Message...");
+
         const setupMsg = {
             setup: {
                 model: `models/${this.config.model}`,
+                generation_config: {
+                    response_modalities: ["AUDIO"]
+                },
                 system_instruction: {
                     parts: [{ text: this.config.systemInstruction }]
                 },
                 tools: [
-                    { google_search_retrieval: {} } // Optional: enable groundedness
+                    { google_search_retrieval: {} }
                 ]
             }
         };
@@ -108,22 +131,33 @@ export class GeminiLiveClient {
 
     private handleMessage(event: MessageEvent) {
         try {
-            const data = JSON.parse(event.data);
+            let data: any;
+            if (event.data instanceof Blob) {
+                this.onLog?.("Received Blob message (unexpected)");
+                return;
+            } else {
+                data = JSON.parse(event.data);
+            }
 
             if (data.serverContent?.modelTurn?.parts) {
                 for (const part of data.serverContent.modelTurn.parts) {
-                    // Handle Audio
                     if (part.inlineData && part.inlineData.mimeType.startsWith('audio')) {
                         this.onAudioData(part.inlineData.data);
                     }
-                    // Handle Text (Summary/Feedback)
                     if (part.text) {
+                        this.onLog?.("Received Text: " + part.text.substring(0, 50) + "...");
                         this.onTextData(part.text);
                     }
                 }
             }
-        } catch (e) {
+
+            if (data.toolUse) {
+                this.onLog?.("Tool Use Requested");
+            }
+
+        } catch (e: any) {
             console.error("Error parsing message:", e);
+            this.onLog?.("Error parsing server message: " + e.message);
         }
     }
 }

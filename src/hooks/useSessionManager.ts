@@ -125,7 +125,7 @@ export function useSessionManager({ onLog }: UseSessionManagerProps = {}) {
         clientRef.current = new GeminiLiveClient(
             {
                 apiKey,
-                model: 'gemini-1.5-flash-latest',
+                model: 'gemini-2.0-flash-exp',
                 systemInstruction: SYSTEM_INSTRUCTION.role + "\n" + SYSTEM_INSTRUCTION.rules.join("\n") + "\n" + SYSTEM_INSTRUCTION.evaluationProtocol
             },
             (state) => {
