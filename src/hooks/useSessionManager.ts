@@ -74,14 +74,16 @@ export function useSessionManager() {
 
     const connect = useCallback(() => {
         if (!audioContextRef.current) {
-            audioContextRef.current = new AudioContext({ sampleRate: 24000 });
+            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+            audioContextRef.current = new AudioContextClass();
         }
 
         setSummary(null); // Reset summary
 
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
         if (!apiKey) {
-            alert("Please set VITE_GEMINI_API_KEY in .env");
+            console.error("API Key missing. Please set VITE_GEMINI_API_KEY in .env");
+            setStatus('error');
             return;
         }
 

@@ -59,8 +59,8 @@ function App() {
           flexDirection: 'column',
           gap: '8px'
         }}>
-          <p className="text-subtitle" style={{ margin: 0 }}>
-            {status === 'disconnected' ? "Tap to catch the vibe" : "Keep the flow going"}
+          <p className="text-subtitle" style={{ margin: 0, color: status === 'error' ? '#FF3B30' : 'inherit' }}>
+            {status === 'error' ? "Connection Error" : status === 'disconnected' ? "Tap to catch the vibe" : "Keep the flow going"}
           </p>
           <div style={{
             height: '2rem',
@@ -70,6 +70,7 @@ function App() {
             {status === 'connected' && "Say: 'Hello!'"}
             {status === 'listening' && "Listening..."}
             {status === 'speaking' && "AI Speaking..."}
+            {status === 'error' && "Check Environment Variables"}
           </div>
         </div>
 
