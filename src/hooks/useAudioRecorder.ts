@@ -4,9 +4,10 @@ export interface AudioRecorderConfig {
     sampleRate: number; // e.g. 16000
     onAudioData: (base64: string) => void;
     onVolumeChange?: (volume: number) => void; // 0-100
+    onLog?: (msg: string) => void;
 }
 
-export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange }: AudioRecorderConfig) {
+export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange, onLog }: AudioRecorderConfig) {
     const [isRecording, setIsRecording] = useState(false);
     const contextRef = useRef<AudioContext | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
@@ -14,20 +15,24 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange }: Au
 
     const start = useCallback(async () => {
         try {
+            onLog?.("Requesting microphone access...");
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: {
                     channelCount: 1,
                     sampleRate: sampleRate,
                 }
             });
+            onLog?.("Microphone access granted");
             streamRef.current = stream;
 
             // Unlock AudioContext for mobile browsers if needed (usually handled by user gesture)
             const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
             const context = new AudioContextClass({ sampleRate });
             contextRef.current = context;
+            onLog?.("AudioContext created");
 
             await context.audioWorklet.addModule('/pcm-processor.js');
+            onLog?.("AudioWorklet loaded");
 
             const source = context.createMediaStreamSource(stream);
             const workletNode = new AudioWorkletNode(context, 'pcm-processor');
@@ -70,11 +75,13 @@ export function useAudioRecorder({ sampleRate, onAudioData, onVolumeChange }: Au
 
             workletNodeRef.current = workletNode;
             setIsRecording(true);
+            onLog?.("Recording started");
 
-        } catch (err) {
+        } catch (err: any) {
             console.error("Error starting audio recorder:", err);
+            onLog?.("Error starting recorder: " + err.message);
         }
-    }, [sampleRate, onAudioData, onVolumeChange]);
+    }, [sampleRate, onAudioData, onVolumeChange, onLog]);
 
     const stop = useCallback(() => {
         if (streamRef.current) {

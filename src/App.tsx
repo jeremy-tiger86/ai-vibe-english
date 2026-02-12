@@ -1,15 +1,24 @@
+import { useState, useCallback } from 'react';
 import { useSessionManager } from './hooks/useSessionManager';
 import VibeButton from './components/VibeButton';
 import ScoreCard from './components/ScoreCard';
 import './index.css';
 
 function App() {
-  const { status, connect, disconnect, volume, summary, score } = useSessionManager();
+  const [logs, setLogs] = useState<string[]>([]);
+  const addLog = useCallback((msg: string) => {
+    setLogs(prev => [...prev.slice(-4), msg]); // Keep last 5 logs
+    console.log(msg);
+  }, []);
+
+  const { status, connect, disconnect, volume, summary, score } = useSessionManager({ onLog: addLog });
 
   const handleToggle = () => {
     if (status === 'disconnected' || status === 'error') {
+      addLog("User clicked Start");
       connect();
     } else {
+      addLog("User clicked Stop");
       disconnect();
     }
   };
@@ -18,13 +27,7 @@ function App() {
     <div className="app-container">
       {/* Background Gradient Mesh (Optional Vibe) */}
       {/* Background - Clean Toss Style (Solid Dark) */}
-      <div style={{
-        position: 'absolute',
-        top: 0, left: 0, width: '100%', height: '100%',
-        background: 'var(--speak-bg-base)',
-        zIndex: -1,
-        pointerEvents: 'none'
-      }} />
+      {/* ... (rest of background) ... */}
 
       <header style={{
         width: '100%',
@@ -74,13 +77,33 @@ function App() {
           </div>
         </div>
 
+        {/* Debug Logs Overlay */}
+        <div style={{
+          position: 'absolute',
+          bottom: '60px',
+          left: '10px',
+          right: '10px',
+          maxHeight: '100px',
+          overflowY: 'auto',
+          background: 'rgba(0,0,0,0.5)',
+          color: '#0f0',
+          fontSize: '10px',
+          padding: '5px',
+          borderRadius: '4px',
+          pointerEvents: 'none',
+          zIndex: 100
+        }}>
+          {logs.map((log, i) => <div key={i}>{log}</div>)}
+        </div>
+
         {/* Session Summary Overlay */}
-        {/* Session Summary / Score Overlay */}
+        {/* ... (rest of overlay) ... */}
         {status === 'disconnected' && (
           <>
             {score ? (
               <ScoreCard score={score} onClose={() => window.location.reload()} />
             ) : summary ? (
+              // ... (summary logic) ...
               <div className="glass-panel" style={{
                 position: 'absolute',
                 top: '50%',

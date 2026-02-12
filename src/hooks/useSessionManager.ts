@@ -5,7 +5,11 @@ import { SYSTEM_INSTRUCTION } from '../config/systemPrompts';
 
 export type SessionStatus = ConnectionState | 'listening' | 'speaking';
 
-export function useSessionManager() {
+interface UseSessionManagerProps {
+    onLog?: (msg: string) => void;
+}
+
+export function useSessionManager({ onLog }: UseSessionManagerProps = {}) {
     const [status, setStatus] = useState<SessionStatus>('disconnected');
     const [volume, setVolume] = useState(0); // For visualization
     const [summary, setSummary] = useState<string | null>(null);
@@ -76,18 +80,35 @@ export function useSessionManager() {
             // Only update volume if not speaking (to avoid conflict with output volume)
             // Or better: Mix them? For now, input volume has priority during 'listening'
             setVolume(vol);
-        }
+        },
+        onLog
     });
 
     const connect = useCallback(async () => {
+        onLog?.("Starting connection...");
         if (!audioContextRef.current) {
-            const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-            audioContextRef.current = new AudioContextClass();
+            onLog?.("Creating AudioContext...");
+            try {
+                const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+                audioContextRef.current = new AudioContextClass();
+                onLog?.("AudioContext created");
+            } catch (e: any) {
+                onLog?.("Error creating AudioContext: " + e.message);
+                setStatus('error');
+                return;
+            }
         }
 
         // Resume AudioContext (important for mobile safari)
         if (audioContextRef.current.state === 'suspended') {
-            await audioContextRef.current.resume();
+            onLog?.("Resuming AudioContext...");
+            try {
+                await audioContextRef.current.resume();
+                onLog?.("AudioContext resumed");
+            } catch (e: any) {
+                onLog?.("Error resuming AudioContext: " + e.message);
+                // Don't return here, try to proceed?
+            }
         }
 
         setSummary(null); // Reset summary
@@ -95,10 +116,12 @@ export function useSessionManager() {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY || '';
         if (!apiKey) {
             console.error("API Key missing. Please set VITE_GEMINI_API_KEY in .env");
+            onLog?.("Error: API Key missing");
             setStatus('error');
             return;
         }
 
+        onLog?.("Initializing Gemini Client...");
         clientRef.current = new GeminiLiveClient(
             {
                 apiKey,
@@ -107,10 +130,14 @@ export function useSessionManager() {
             },
             (state) => {
                 setStatus(state);
+                onLog?.("Gemini State: " + state);
                 if (state === 'connected') {
+                    onLog?.("Gemini Connected. Starting mic...");
                     startRecording();
                 } else if (state === 'disconnected') {
                     stopRecording();
+                } else if (state === 'error') {
+                    onLog?.("Gemini Error");
                 }
             },
             (audioData) => {
@@ -133,8 +160,9 @@ export function useSessionManager() {
                 });
             }
         );
+        onLog?.("Connecting to Gemini...");
         clientRef.current.connect();
-    }, [startRecording, stopRecording, playAudioChunk]);
+    }, [startRecording, stopRecording, playAudioChunk, onLog]);
 
     const disconnect = useCallback(() => {
         clientRef.current?.disconnect();
@@ -143,5 +171,5 @@ export function useSessionManager() {
         setVolume(0);
     }, [stopRecording]);
 
-    return { status, connect, disconnect, volume, SYSTEM_INSTRUCTION, summary, score };
+    return { status, connect, disconnect, volume, SYSTEM_INSTRUCTION, summary, score, onLog };
 }
